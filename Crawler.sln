@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerGUI", "Crawler\Crawl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerLib", "CrawlerLib\CrawlerLib.csproj", "{CC553B6D-68E9-4B3A-B288-ADBBB4B9099F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerConsole", "CrawlerConsole\CrawlerConsole.csproj", "{EA70815B-29C7-4FCB-AA6D-F1B96E890E56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerLibTests", "CrawlerLibTests\CrawlerLibTests.csproj", "{3E942B21-1626-4DBA-89AB-FE7908C84175}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{CC553B6D-68E9-4B3A-B288-ADBBB4B9099F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC553B6D-68E9-4B3A-B288-ADBBB4B9099F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC553B6D-68E9-4B3A-B288-ADBBB4B9099F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA70815B-29C7-4FCB-AA6D-F1B96E890E56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA70815B-29C7-4FCB-AA6D-F1B96E890E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA70815B-29C7-4FCB-AA6D-F1B96E890E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA70815B-29C7-4FCB-AA6D-F1B96E890E56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E942B21-1626-4DBA-89AB-FE7908C84175}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E942B21-1626-4DBA-89AB-FE7908C84175}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E942B21-1626-4DBA-89AB-FE7908C84175}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E942B21-1626-4DBA-89AB-FE7908C84175}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

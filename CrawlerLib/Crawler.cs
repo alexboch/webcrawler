@@ -6,13 +6,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace CrawlerLib
 {
     public class Crawler
     {
         #region Fields
-        private const string RegexString = "<a\\s+href\\s*=(?<url>\\s*\".*\"\\s*)>.*<\\/a>";
+        private const string RegexString = "<a.+href\\s*=(?<url>\\s*\".*\"\\s*)>.*</a>";
+//.* "\s*)>.*</a>";
         private readonly Regex _hrefRegex = new Regex(RegexString);
         private readonly CancellationTokenSource _cts=new CancellationTokenSource();
 #endregion
@@ -24,9 +26,9 @@ namespace CrawlerLib
 
         private void CrawlDomain(Uri domainUri)
         {
+            Debug.WriteLine(domainUri);
             var uriQueue = new Queue<Uri>();//Очередь для нерекурсивного обхода в ширину
             var uriHashSet = new HashSet<Uri>();//Множество обойденных ури
-
             uriQueue.Enqueue(domainUri);
             using (var wc = new WebClient())
             {
@@ -48,13 +50,16 @@ namespace CrawlerLib
             }
         }
 
+
         private List<Uri> CrawlPage(string pageContent)
         {
             var uriList = new List<Uri>();
             var matches = _hrefRegex.Matches(pageContent);
-            foreach(Match m in matches)
+            
+            foreach (Match m in matches)
             {
-                string urlString = m.Groups["url"].Value;
+                var group = m.Groups["url"];
+                string urlString =group.Value;
                 var uri = new Uri(urlString);
                 uriList.Add(uri);
             }
@@ -63,7 +68,7 @@ namespace CrawlerLib
 
         public async Task CrawlDomainsAsync(IEnumerable<string> domainNames,string outputPath)
         {
-            var uris = domainNames.Select((name) => new Uri(name));
+            var uris = domainNames.Select((name) => new Uri(name,UriKind.Absolute));
             await Task.Factory.StartNew(()=>Parallel.ForEach(uris, (CrawlDomain)),_cts.Token);
         }
 

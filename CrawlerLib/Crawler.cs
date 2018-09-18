@@ -28,7 +28,6 @@ namespace CrawlerLib
 
         private void CrawlDomain(Uri domainUri)
         {
-            Debug.WriteLine(domainUri);
             var uriQueue = new Queue<Uri>();//Очередь для нерекурсивного обхода в ширину
             var uriHashSet = new HashSet<string>();//Множество обойденных ури
             uriQueue.Enqueue(domainUri);

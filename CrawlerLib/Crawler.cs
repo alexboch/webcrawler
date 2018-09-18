@@ -40,11 +40,12 @@ namespace CrawlerLib
                 baseUri = UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri);
                 if (!uriHashSet.Contains(uri.AbsolutePath))//Чтобы не зациклиться
                 {
-                    var htmlDoc = hc.Load(baseUri);//todo:обработка ошибок(напр. 404)
+                    var htmlDoc = hc.Load(baseUri);//todo:статистика кодов статуса
                     uriHashSet.Add(baseUri.AbsolutePath);
                     var uris = CrawlPage(htmlDoc, baseUri);
                     foreach (var u in uris)
                     {
+
                         uriQueue.Enqueue(u);
                     }
                 }

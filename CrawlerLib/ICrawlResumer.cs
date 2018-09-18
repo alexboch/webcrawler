@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace CrawlerLib
 {
-    class LinkFinder
+    interface ICrawlResumer
     {
+        bool CanCrawl(CrawlingState crawlingState);
     }
 }

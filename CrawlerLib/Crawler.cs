@@ -21,6 +21,8 @@ namespace CrawlerLib
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         #endregion
 
+        public event EventHandler<PageContentLoadedEventArgs> PageContentLoaded;
+
         public void CancelCrawling()
         {
             _cts.Cancel();
@@ -41,6 +43,7 @@ namespace CrawlerLib
                 if (!uriHashSet.Contains(uri.AbsolutePath))//Чтобы не зациклиться
                 {
                     var htmlDoc = hc.Load(baseUri);//todo:статистика кодов статуса
+                    PageContentLoaded?.Invoke(this, new PageContentLoadedEventArgs(uri,htmlDoc.DocumentNode.OuterHtml));
                     uriHashSet.Add(baseUri.AbsolutePath);
                     var uris = CrawlPage(htmlDoc, baseUri);
                     foreach (var u in uris)
@@ -84,7 +87,9 @@ namespace CrawlerLib
             {
                 return new UriBuilder(name).Uri;
             });
-            await Task.Factory.StartNew(() => Parallel.ForEach(uris, (CrawlDomain)), _cts.Token);
+            var opt = new ParallelOptions();
+            opt.CancellationToken = _cts.Token;
+            await Task.Factory.StartNew(() => Parallel.ForEach(uris,opt, (CrawlDomain)), _cts.Token);
         }
 
     }

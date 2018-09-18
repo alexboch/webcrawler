@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CrawlerLib
 {
-    interface ICrawlResumer
+    interface ICrawlPermitter
     {
-        bool CanCrawl(CrawlingState crawlingState);
+        bool CanCrawl(CrawlingState crawlingState,Uri nextUri);
     }
 }

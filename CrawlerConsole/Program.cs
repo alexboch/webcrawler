@@ -12,7 +12,7 @@ namespace CrawlerConsole
         static void Main(string[] args)
         {
             var crawler = new Crawler();
-            crawler.CrawlDomainsAsync(new []{ "http://google.com","http://youtube.com"},"Output");
+            crawler.CrawlDomainsAsync(new []{"https://google.ru/" },"Output");
             Console.ReadKey();
         }
     }

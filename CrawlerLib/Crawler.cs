@@ -15,10 +15,11 @@ namespace CrawlerLib
     {
         #region Fields
         private const string RegexString = "<a.+href\\s*=(?<url>\\s*\".*\"\\s*)>.*</a>";
-//.* "\s*)>.*</a>";
+
+        //.* "\s*)>.*</a>";
         private readonly Regex _hrefRegex = new Regex(RegexString);
-        private readonly CancellationTokenSource _cts=new CancellationTokenSource();
-#endregion
+        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        #endregion
 
         public void CancelCrawling()
         {
@@ -29,7 +30,7 @@ namespace CrawlerLib
         {
             Debug.WriteLine(domainUri);
             var uriQueue = new Queue<Uri>();//Очередь для нерекурсивного обхода в ширину
-            var uriHashSet = new HashSet<Uri>();//Множество обойденных ури
+            var uriHashSet = new HashSet<string>();//Множество обойденных ури
             uriQueue.Enqueue(domainUri);
             var hc = new HtmlWeb();
             Uri baseUri = domainUri;
@@ -37,37 +38,53 @@ namespace CrawlerLib
             {
                 if (uriQueue.Count == 0) break;
                 Uri uri = uriQueue.Dequeue();
-                if (!uriHashSet.Contains(uri))//Чтобы не зациклиться
+                baseUri = UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri);
+                if (!uriHashSet.Contains(uri.AbsolutePath))//Чтобы не зациклиться
                 {
-                    var htmlDoc = hc.Load(uri);
-                    uriHashSet.Add(uri);
-                    var uris = CrawlPage(htmlDoc,baseUri);
+                    var htmlDoc = hc.Load(baseUri);//todo:обработка ошибок(напр. 404)
+                    uriHashSet.Add(baseUri.AbsolutePath);
+                    var uris = CrawlPage(htmlDoc, baseUri);
                     foreach (var u in uris)
                     {
                         uriQueue.Enqueue(u);
                     }
                 }
             }
-
         }
 
 
-        private List<Uri> CrawlPage(HtmlDocument htmlDoc,Uri baseUri)
+
+        private List<Uri> CrawlPage(HtmlDocument htmlDoc, Uri baseUri)
         {
+
             var uriList = new List<Uri>();
             foreach (HtmlNode link in htmlDoc.DocumentNode.SelectNodes("//a[@href]"))//Все ссылки
             {
                 string hrefValue = link.GetAttributeValue("href", string.Empty);
-                if(!String.IsNullOrEmpty(hrefValue))
-                    uriList.Add(new Uri(hrefValue));
+                if (!String.IsNullOrEmpty(hrefValue))
+                {
+                    try
+                    {
+                        //var uri = new UriBuilder("http\\",baseUri.Host).Uri;
+                        var uri = new Uri(hrefValue, UriKind.RelativeOrAbsolute);
+                        uriList.Add(UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri));
+                    }
+                    catch(UriFormatException)//todo:Добавить проверку Uri
+                    {
+
+                    }
+                }
             }
             return uriList;
         }
 
-        public async Task CrawlDomainsAsync(IEnumerable<string> domainNames,string outputPath)
+        public async Task CrawlDomainsAsync(IEnumerable<string> domainNames, string outputPath)
         {
-            var uris = domainNames.Select((name) => new Uri(name,UriKind.Absolute));
-            await Task.Factory.StartNew(()=>Parallel.ForEach(uris, (CrawlDomain)),_cts.Token);
+            var uris = domainNames.Select((name) =>
+            {
+                return new UriBuilder(name).Uri;
+            });
+            await Task.Factory.StartNew(() => Parallel.ForEach(uris, (CrawlDomain)), _cts.Token);
         }
 
     }

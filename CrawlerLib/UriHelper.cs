@@ -8,9 +8,11 @@ namespace CrawlerLib
 {
     static class UriHelper
     {
-        public static Uri MakeUri()
+        public static Uri MakeAbsoluteUriIfNeeded(Uri uri,Uri baseUri)
         {
-            throw new NotImplementedException();
+            if (!uri.IsAbsoluteUri)
+                uri = new Uri(baseUri, uri);
+            return uri;
         }
     }
 }

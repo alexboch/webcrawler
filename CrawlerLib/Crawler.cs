@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using HtmlAgilityPack;
 
 namespace CrawlerLib
 {
@@ -30,38 +31,35 @@ namespace CrawlerLib
             var uriQueue = new Queue<Uri>();//Очередь для нерекурсивного обхода в ширину
             var uriHashSet = new HashSet<Uri>();//Множество обойденных ури
             uriQueue.Enqueue(domainUri);
-            using (var wc = new WebClient())
+            var hc = new HtmlWeb();
+            Uri baseUri = domainUri;
+            while (true)
             {
-                while (true)
+                if (uriQueue.Count == 0) break;
+                Uri uri = uriQueue.Dequeue();
+                if (!uriHashSet.Contains(uri))//Чтобы не зациклиться
                 {
-                    if (uriQueue.Count == 0) break;
-                    Uri uri = uriQueue.Dequeue();
-                    if (!uriHashSet.Contains(uri))//Чтобы не зациклиться
+                    var htmlDoc = hc.Load(uri);
+                    uriHashSet.Add(uri);
+                    var uris = CrawlPage(htmlDoc,baseUri);
+                    foreach (var u in uris)
                     {
-                        string pageContent = wc.DownloadString(uri);
-                        uriHashSet.Add(uri);
-                        var uris = CrawlPage(pageContent);
-                        foreach (var u in uris)
-                        {
-                            uriQueue.Enqueue(u);
-                        }
+                        uriQueue.Enqueue(u);
                     }
                 }
             }
+
         }
 
 
-        private List<Uri> CrawlPage(string pageContent)
+        private List<Uri> CrawlPage(HtmlDocument htmlDoc,Uri baseUri)
         {
             var uriList = new List<Uri>();
-            var matches = _hrefRegex.Matches(pageContent);
-            
-            foreach (Match m in matches)
+            foreach (HtmlNode link in htmlDoc.DocumentNode.SelectNodes("//a[@href]"))//Все ссылки
             {
-                var group = m.Groups["url"];
-                string urlString =group.Value;
-                var uri = new Uri(urlString);
-                uriList.Add(uri);
+                string hrefValue = link.GetAttributeValue("href", string.Empty);
+                if(!String.IsNullOrEmpty(hrefValue))
+                    uriList.Add(new Uri(hrefValue));
             }
             return uriList;
         }

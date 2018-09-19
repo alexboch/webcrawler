@@ -11,7 +11,7 @@ namespace CrawlerLib
     {
         public int Depth { get; set; }
         public int TotalPagesVisited { get;set; }
-        public string CurrentUriString { get; set; }
+        public Uri CurrentUri { get; set; }
         public string CurrentDocumentContent { get; set; }
         
 

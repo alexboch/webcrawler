@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CrawlerTests.cs" />
+    <Compile Include="DomainOnlyCrawlPermitterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

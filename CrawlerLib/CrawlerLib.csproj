@@ -43,8 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlwaysCanCrawlPermitter.cs" />
     <Compile Include="Crawler.cs" />
     <Compile Include="CrawlingState.cs" />
+    <Compile Include="DomainOnlyCrawlPermitter.cs" />
     <Compile Include="ICrawlPermitter.cs" />
     <Compile Include="MyWebClient.cs">
       <SubType>Component</SubType>

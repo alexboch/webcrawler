@@ -19,13 +19,11 @@ namespace CrawlerLib
         //.* "\s*)>.*</a>";
         private readonly Regex _hrefRegex = new Regex(RegexString);
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        public ICrawlPermitter CrawlPermitter { get;private set; }=new AlwaysCanCrawlPermitter();
         #endregion
 
         public event EventHandler<PageContentLoadedEventArgs> PageContentLoaded;
 
-        public CrawlingState State => _state;
-
-        private CrawlingState _state;
         public void CancelCrawling()
         {
             _cts.Cancel();
@@ -33,10 +31,10 @@ namespace CrawlerLib
 
         private void CrawlDomain(Uri domainUri)
         {
+            CrawlingState state=new CrawlingState();//Состояние кроулинга для домена
             var uriQueue = new Queue<Uri>();//Очередь для нерекурсивного обхода в ширину
             var uriHashSet = new HashSet<string>();//Множество обойденных ури
             uriQueue.Enqueue(domainUri);
-            var hc = new HtmlWeb();
             Uri baseUri = domainUri;
             var mwc=new MyWebClient();
             int levelRefsCount = uriQueue.Count;//Количество ссылок на уровне
@@ -48,12 +46,13 @@ namespace CrawlerLib
                 levelRefsCount--;
                 if (levelRefsCount == 0)//Если прошли все ссылки уровня
                 {
-                    _state.Depth++;
+                    state.Depth++;
                     levelRefsCount = nextLevelRefs;
                     nextLevelRefs = 0;
                 }
                 baseUri = UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri);
-                if (!uriHashSet.Contains(uri.AbsolutePath))//Чтобы не зациклиться
+                if (!uriHashSet.Contains(uri.AbsolutePath)//Чтобы не зациклиться
+                    &&CrawlPermitter.CanCrawl(state,uri,domainUri))
                 {
                     try
                     {
@@ -63,7 +62,7 @@ namespace CrawlerLib
                         htmlDoc.LoadHtml(htmlStr);
                         PageContentLoaded?.Invoke(this, new PageContentLoadedEventArgs(uri, htmlDoc.DocumentNode.OuterHtml));
                         uriHashSet.Add(baseUri.AbsolutePath);
-                        var uris = CrawlPage(htmlDoc, baseUri);
+                        var uris = GetPageLinks(htmlDoc, baseUri);
                         foreach (var u in uris)
                         {
                             nextLevelRefs++;
@@ -82,7 +81,7 @@ namespace CrawlerLib
 
 
 
-        private List<Uri> CrawlPage(HtmlDocument htmlDoc, Uri baseUri)
+        private List<Uri> GetPageLinks(HtmlDocument htmlDoc, Uri baseUri)
         {
 
             var uriList = new List<Uri>();
@@ -114,6 +113,19 @@ namespace CrawlerLib
             var opt = new ParallelOptions();
             opt.CancellationToken = _cts.Token;
             await Task.Factory.StartNew(() => Parallel.ForEach(uris,opt, (CrawlDomain)), _cts.Token);
+        }
+
+        public Crawler(ICrawlPermitter crawlPermitter)
+        {
+            if (crawlPermitter == null)
+            {
+                throw new ArgumentNullException(nameof(crawlPermitter));
+            }
+            CrawlPermitter = crawlPermitter;
+        }
+        public Crawler()
+        {
+            
         }
 
     }

@@ -8,6 +8,12 @@ namespace CrawlerLib
 {
     public static class UriHelper
     {
+        /// <summary>
+        /// Создает из Uri абсолютное, если оно является относительным
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="baseUri"></param>
+        /// <returns></returns>
         public static Uri MakeAbsoluteUriIfNeeded(Uri uri,Uri baseUri)
         {
             if (!uri.IsAbsoluteUri)
@@ -15,7 +21,6 @@ namespace CrawlerLib
             return uri;
         }
         
-
         public static bool IsSubdomainOf(this Uri uri,Uri domainUri)
         {
             //string schemeString=uri.Scheme.ToString();
@@ -24,17 +29,17 @@ namespace CrawlerLib
             string domainHost = domainUri.Host;
             var parts = host.Split('.');
             var domainParts = domainHost.Split('.');
-            bool isSub = true;
+            bool isNotSub = false;
             for(int i=domainParts.Length-1,j=parts.Length-1;i>=0;i--,j--)
             {
                 
                 if(j<0||domainParts[i]!=parts[j])
                 {
-                    isSub = false;
+                    isNotSub = false;
                     break;
                 }
             }
-            return isSub;
+            return isNotSub;
         }
     }
 }

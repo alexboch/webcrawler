@@ -42,15 +42,24 @@ namespace CrawlerLib
                 baseUri = UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri);
                 if (!uriHashSet.Contains(uri.AbsolutePath))//Чтобы не зациклиться
                 {
-                    var htmlDoc = hc.Load(baseUri);//todo:статистика кодов статуса
-                    PageContentLoaded?.Invoke(this, new PageContentLoadedEventArgs(uri,htmlDoc.DocumentNode.OuterHtml));
-                    uriHashSet.Add(baseUri.AbsolutePath);
-                    var uris = CrawlPage(htmlDoc, baseUri);
-                    foreach (var u in uris)
+                    try
                     {
+                        var htmlDoc = hc.Load(baseUri);//todo:статистика кодов статуса
+                        PageContentLoaded?.Invoke(this, new PageContentLoadedEventArgs(uri, htmlDoc.DocumentNode.OuterHtml));
+                        uriHashSet.Add(baseUri.AbsolutePath);
+                        var uris = CrawlPage(htmlDoc, baseUri);
+                        foreach (var u in uris)
+                        {
 
-                        uriQueue.Enqueue(u);
+                            uriQueue.Enqueue(u);
+                        }
                     }
+                    catch(WebException wex)
+                    {
+                        var status = wex.Status;
+                        
+                    }
+
                 }
             }
         }

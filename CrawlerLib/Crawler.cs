@@ -43,12 +43,15 @@ namespace CrawlerLib
             {
                 if (uriQueue.Count == 0) break;
                 Uri uri = uriQueue.Dequeue();
-                levelRefsCount--;
-                if (levelRefsCount == 0)//Если прошли все ссылки уровня
+                if (levelRefsCount == 0) //Если прошли все ссылки уровня
                 {
                     state.Depth++;
                     levelRefsCount = nextLevelRefs;
                     nextLevelRefs = 0;
+                }
+                else
+                {
+                    levelRefsCount--;
                 }
                 baseUri = UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri);
                 if (!uriHashSet.Contains(uri.AbsolutePath)//Чтобы не зациклиться

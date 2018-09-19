@@ -85,19 +85,23 @@ namespace CrawlerLib
         {
 
             var uriList = new List<Uri>();
-            foreach (HtmlNode link in htmlDoc.DocumentNode.SelectNodes("//a[@href]"))//Все ссылки
+            var refNodes = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
+            if (refNodes != null)
             {
-                string hrefValue = link.GetAttributeValue("href", string.Empty);
-                if (!String.IsNullOrEmpty(hrefValue))
+                foreach (HtmlNode link in refNodes) //Все ссылки
                 {
-                    try
+                    string hrefValue = link.GetAttributeValue("href", string.Empty);
+                    if (!String.IsNullOrEmpty(hrefValue))
                     {
-                        var uri = new Uri(hrefValue, UriKind.RelativeOrAbsolute);
-                        uriList.Add(UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri));
-                    }
-                    catch(UriFormatException)//todo:Добавить проверку Uri
-                    {
+                        try
+                        {
+                            var uri = new Uri(hrefValue, UriKind.RelativeOrAbsolute);
+                            uriList.Add(UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri));
+                        }
+                        catch (UriFormatException) //todo:Добавить проверку Uri
+                        {
 
+                        }
                     }
                 }
             }

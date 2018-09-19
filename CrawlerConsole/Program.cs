@@ -9,9 +9,9 @@ namespace CrawlerConsole
 {
     class Program
     {
-        static async void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var crawler = new Crawler();
+            var crawler = new Crawler(new DomainOnlyCrawlPermitter());
             await crawler.CrawlDomainsAsync(new []{"https://google.ru/" },"Output");
             Console.ReadKey();
         }

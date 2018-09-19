@@ -29,17 +29,17 @@ namespace CrawlerLib
             string domainHost = domainUri.Host;
             var parts = host.Split('.');
             var domainParts = domainHost.Split('.');
-            bool isNotSub = false;
+            bool isSubdomainOf = false;
             for(int i=domainParts.Length-1,j=parts.Length-1;i>=0;i--,j--)
             {
                 
                 if(j<0||domainParts[i]!=parts[j])
                 {
-                    isNotSub = false;
+                    isSubdomainOf = true;
                     break;
                 }
             }
-            return isNotSub;
+            return isSubdomainOf;
         }
     }
 }

@@ -35,6 +35,7 @@ namespace CrawlerLib
             uriQueue.Enqueue(domainUri);
             var hc = new HtmlWeb();
             Uri baseUri = domainUri;
+            var mwc=new MyWebClient();
             while (true)
             {
                 if (uriQueue.Count == 0) break;
@@ -44,7 +45,10 @@ namespace CrawlerLib
                 {
                     try
                     {
-                        var htmlDoc = hc.Load(baseUri);//todo:статистика кодов статуса
+                        //todo:статистика кодов статуса
+                        var htmlDoc=new HtmlDocument();
+                        string htmlStr=mwc.DownloadString(baseUri);
+                        htmlDoc.LoadHtml(htmlStr);
                         PageContentLoaded?.Invoke(this, new PageContentLoadedEventArgs(uri, htmlDoc.DocumentNode.OuterHtml));
                         uriHashSet.Add(baseUri.AbsolutePath);
                         var uris = CrawlPage(htmlDoc, baseUri);
@@ -77,7 +81,6 @@ namespace CrawlerLib
                 {
                     try
                     {
-                        //var uri = new UriBuilder("http\\",baseUri.Host).Uri;
                         var uri = new Uri(hrefValue, UriKind.RelativeOrAbsolute);
                         uriList.Add(UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri));
                     }

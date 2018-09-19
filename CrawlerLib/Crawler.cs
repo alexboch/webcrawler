@@ -23,6 +23,9 @@ namespace CrawlerLib
 
         public event EventHandler<PageContentLoadedEventArgs> PageContentLoaded;
 
+        public CrawlingState State => _state;
+
+        private CrawlingState _state;
         public void CancelCrawling()
         {
             _cts.Cancel();
@@ -36,10 +39,19 @@ namespace CrawlerLib
             var hc = new HtmlWeb();
             Uri baseUri = domainUri;
             var mwc=new MyWebClient();
+            int levelRefsCount = uriQueue.Count;//Количество ссылок на уровне
+            int nextLevelRefs = 0;
             while (true)
             {
                 if (uriQueue.Count == 0) break;
                 Uri uri = uriQueue.Dequeue();
+                levelRefsCount--;
+                if (levelRefsCount == 0)//Если прошли все ссылки уровня
+                {
+                    _state.Depth++;
+                    levelRefsCount = nextLevelRefs;
+                    nextLevelRefs = 0;
+                }
                 baseUri = UriHelper.MakeAbsoluteUriIfNeeded(uri, baseUri);
                 if (!uriHashSet.Contains(uri.AbsolutePath))//Чтобы не зациклиться
                 {
@@ -54,7 +66,7 @@ namespace CrawlerLib
                         var uris = CrawlPage(htmlDoc, baseUri);
                         foreach (var u in uris)
                         {
-
+                            nextLevelRefs++;
                             uriQueue.Enqueue(u);
                         }
                     }

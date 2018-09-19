@@ -7,7 +7,7 @@ using HtmlAgilityPack;
 
 namespace CrawlerLib
 {
-    struct CrawlingState
+    public struct CrawlingState
     {
         public int Depth { get; set; }
         public int TotalPagesVisited { get;set; }
